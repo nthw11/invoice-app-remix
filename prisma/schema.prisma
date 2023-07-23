@@ -8,14 +8,21 @@ generator client {
 }
 
 model User {
-  id    String @id @default(cuid())
-  email String @unique
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String
+  address        String
+  city           String
+  state          String
+  zip            String
+  phone          String
+  employeeNumber String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   password Password?
   notes    Note[]
+  invoices Invoice[]
 }
 
 model Password {
@@ -35,4 +42,51 @@ model Note {
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
+}
+
+model LineItem {
+  id          String   @id @default(cuid())
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id])
+  invoiceId   String
+  description String
+  quantity    Int
+  unitPrice   Float
+  amount      Float
+  date        DateTime
+  startTime   DateTime
+  endTime     DateTime
+  taskOrShow  String
+  linePO      String
+  lineTotal   Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Invoice {
+  id            String     @id @default(cuid())
+  invoiceLabel  String
+  invoiceNumber String     @unique
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId        String
+  poNumber      String
+  invoiceDate   DateTime
+  dueDate       DateTime
+  lineItems     LineItem[]
+  invoiceTotal  Float
+  vendor        Vendor     @relation(fields: [vendorId], references: [id])
+  vendorId      String
+}
+
+model Vendor {
+  id        String    @id @default(cuid())
+  name      String
+  address   String
+  city      String
+  state     String
+  zip       String
+  phone     String
+  email     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Invoice   Invoice[]
 }
